@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const fetch = require('node-fetch');
+const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 const {SessionsClient} = require('@google-cloud/dialogflow-cx');
 
 const LANGUAGE_CODE = 'en';
@@ -15,9 +15,12 @@ app.use(bodyParser.json());
 
 app.post('/webhook', async (req, res) => {
   const message = req.body.message;
+  console.log(message)
   if (!message || !message.text) return res.sendStatus(200);
 
   const sessionId = message.chat.id;
+  console.log(message.chat)
+  console.log(sessionId)
   const sessionPath = SESSION_CLIENT.projectLocationAgentSessionPath(
       process.env.PROJECT_ID,
       process.env.LOCATION,
