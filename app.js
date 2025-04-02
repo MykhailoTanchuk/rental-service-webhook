@@ -15,7 +15,6 @@ app.use(bodyParser.json());
 app.post('/webhook', async (req, res) => {
   try {
     const message = req.body.message;
-    console.log('📩 Incoming message from Telegram:', JSON.stringify(message, null, 2));
 
     if (!message || !message.text) {
       console.log('⚠️ Message missing or not text — skipping.');
@@ -46,10 +45,15 @@ app.post('/webhook', async (req, res) => {
     const [response] = await SESSION_CLIENT.detectIntent(request);
 
     console.log('🎯 Full Dialogflow Response:');
-    console.log(JSON.stringify(response, null, 2));
+    console.log(JSON.stringify(response.queryResult.text, null, 2));
+    console.log(JSON.stringify(response.queryResult.responseMessages, null, 2));
 
-    const botReply = response.textResponses?.[0]?.text || 'Sorry, I didn’t understand that.';
-    console.log(`🤖 Bot reply: "${botReply}"`);
+    const messages = response.queryResult.responseMessages || [];
+    const botReply = messages
+        .filter(msg => msg.text?.text?.length)
+        .map(msg => msg.text.text[0])
+        .join('\n') || 'Sorry, I didn’t understand that.';
+
 
     const telegramResponse = await fetch(`${process.env.TELEGRAM_API}/sendMessage`, {
       method: 'POST',
