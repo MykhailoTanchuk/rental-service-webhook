@@ -4,7 +4,11 @@ const fetch = require('node-fetch');
 const {SessionsClient} = require('@google-cloud/dialogflow-cx');
 
 const LANGUAGE_CODE = 'en';
-const SESSION_CLIENT = new SessionsClient({ keyFilename: 'google.json' });
+const SESSION_CLIENT = new SessionsClient({
+  keyFilename: 'google.json',
+  apiEndpoint: 'europe-west1-dialogflow.googleapis.com',
+});
+
 
 const app = express();
 app.use(bodyParser.json());
